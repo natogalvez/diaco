@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Free Bootstrap Themes by Zerotheme dot com - Free Responsive Html5 Templates">
+    <meta name="author" content="https://www.Zerotheme.com">
+	
+    <title>{% block title %}{% endblock %}</title>
+	
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" type="text/css">
+	
+	<!-- Custom CSS -->
+	<link href="{% static 'css/style.css' %}" rel="stylesheet">
+	
+	<!-- Animate.css -->
+	<link href="{% static 'css/animate.css' %}" rel="stylesheet" media="all" type="text/css">
+	
+	<!-- Lightbox.css -->
+	<link href="{% static 'css/lightbox.min.css' %}" rel="stylesheet" media="all" type="text/css">
+	
+	<!-- Custom Fonts -->
+    <link href="{% static 'font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+	
+
+	
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="{% static 'js/html5shiv.js' %}"></script>
+        <script src="{% static 'js/respond.min.js' %}"></script>
+    <![endif]-->
+</head>
+<body id="page-top" class="index-page">
+<div class="wrap-body">
+
+	<!--////////////////////////////////////Header-->
+	<header>
+		<!---Main Header--->
+		<div class="main-header">
+			<div class="logo">
+				<img src="{% static 'images/GobiernoLogo.jpg' %}" class="img-responsive">
+			</div>
+			<!--Navigation-->
+			<nav id="menu" class="navbar">
+			{% block menu %}{% endblock %}
+			</nav>
+			{% block hero %}
+			{% endblock %}
+			
+		</div>
+	</header>
+	<!-- /Section: intro -->
+
+
+	<!--////////////////////////////////////Container-->
+	{% block content %}
+	{% endblock %}
+
+	<!--////////////////////////////////////Footer-->
+	<footer id="footer">
+		<div class="container">
+			<div class="wrap-footer">
+				<ul class="list-inline footer-link link">
+					<li><a href="https://www.facebook.com/DiacoGT">Facebook</a></li>
+					<li><a href="https://twitter.com/diaco_gt">Twitter</a></li>
+				</ul>
+				<div class="copyright">
+					<span>Copyright © 20xx - Designed by <a href="https://www.Zerotheme.com" target="_blank">Zerotheme</a></span>
+				</div>
+			</div> 
+		</div>
+	</footer>
+	<!-- Footer -->
+	<div id="page-top"><a href="#page-top" class="btn btn-toTop"><i class="fa fa-angle-double-up"></i></a></div>
+	
+	<!-- ========== Scripts ========== -->
+	<script type="text/javascript" src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/jquery.localScroll.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/jquery.scrollTo.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/SmoothScroll.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/wow.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/isotope.pkgd.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/lightbox.min.js' %}"></script>
+	
+	<!-- Definity JS -->
+	<script type="text/javascript" src="{% static 'js/main.js' %}"></script>
+	
+</div>
+</body>
+</html>

@@ -11,18 +11,16 @@
                 <li><a href="{% url 'ingreso_queja' %}">Ingresa una queja</a></li>
                 {% if user.is_anonymous %}<li><a href="{% url 'buscar_queja' %}">Busca tu queja</a></li>{% endif %}
                 {% if user.is_authenticated %}<li><a href="{% url 'buscar_queja' %}">Busqueda de quejas</a></li>{% endif %}
-                <li><a href="/single/">Consultas / Filtros</a></li>
-                <li><a href="{% url 'login' %}">Ingreso de usuario</a></li>
+                {% if user.is_anonymous %}<li><a href="{% url 'login' %}">Ingreso de usuario</a></li>{% endif %}
                 {% if user.is_authenticated %}
                 <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Operaciones de Usuario <i class="fa fa-chevron-down"></i></a>
                     <div class="dropdown-menu" style="margin-left: -0.5px;">
                         <div class="dropdown-inner">
                             <ul class="list-unstyled">
-                                <li><a href="/archive/">Text 301</a></li>
-                                <li><a href="/archive/">Text 302</a></li>
-                                <li><a href="/archive/">Text 303</a></li>
-                                <li><a href="/archive/">Text 304</a></li>
-                                <li><a href="/archive/">Text 305</a></li>
+                                <li><a href="/consulta_quejas/region/">Quejas por Region</a></li>
+                                <li><a href="/archive/departamento/">Quejas por Departamento</a></li>
+                                <li><a href="/archive/municipio/">Quejas por Municipio</a></li>
+                                <li><a href="/archive/comercio/">Quejas por Comercio</a></li>
                             </ul>
                         </div>
                     </div>

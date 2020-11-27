@@ -7,6 +7,7 @@ from django.forms import inlineformset_factory
 #model related imports
 from quejas.models import *
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import connection
 
 
 #auth related imports
@@ -37,9 +38,9 @@ def view_ingreso_queja(request):
             var_municipio = Municipio.objects.get(id = form_limpio['CampoMunicipio'].id)
 
             try:
-                var_negocio = Negocio.objects.get(NombreComercial=form_limpio["CampoNombreComercial"])
+                var_negocio = Negocio.objects.get(nombre_comercial=form_limpio["CampoNombreComercial"])
             except ObjectDoesNotExist:
-                var_negocio = Negocio.objects.create(NombreComercial=form_limpio["CampoNombreComercial"])
+                var_negocio = Negocio.objects.create(nombre_comercial=form_limpio["CampoNombreComercial"])
 
             try:
                 var_sucursal = Sucursal.objects.get(municipio=var_municipio,
@@ -50,7 +51,7 @@ def view_ingreso_queja(request):
                 direccion=form_limpio["Direccion"],
                 negocio=var_negocio)
 
-            var_queja = Queja.objects.create(Sucursal=var_sucursal, 
+            var_queja = Queja.objects.create(sucursal=var_sucursal, 
                 fecha_creacion=datetime.datetime.now(), 
                 fecha_actualizacion=datetime.datetime.now(),
                 notificar_email=form_limpio["Email"])
@@ -59,7 +60,7 @@ def view_ingreso_queja(request):
                 comentario=form_limpio["TextoQueja"],
                 fecha_creacion=datetime.datetime.now(),
                 queja=var_queja,
-                tipo_accion=TipoAccion.objects.get(Nombre="creacion")                
+                tipo_accion=TipoAccion.objects.get(nombre="creacion")                
                 )
 
             messages.success(request,'Queja ingresada con éxito. Numero de Queja: %s' %(var_queja.id))
@@ -185,48 +186,107 @@ def view_mostrar_accion(request,accion_id):
 
         return render(request, "accion_individual.html",contexto)
 
-def view_buscar_queja_anon(request):
-    
-    if request.method == "POST":
+def dictfetchall(cursor):
+    "Return all rows from a cursor as a dict"
+    columns = [col[0] for col in cursor.description]
+    return [
+        dict(zip(columns, row))
+        for row in cursor.fetchall()
+    ]
 
-        formulario = form_buscar_queja(data=request.POST)
+def correr_sql(query,args=None):
+    with connection.cursor() as cursor:
+        cursor.execute(query,args)
+        query_set_data = cursor.fetchall()
 
-        if formulario.is_valid():
-            form_limpio=formulario.cleaned_data
+    return query_set_data
 
-            var_queja=None
+@login_required(login_url='login')
+def view_consulta_queja(request,tipo,parent_id=None):
 
-            try:
-                var_queja= Queja.objects.get(id=form_limpio['num_queja'])
-            except ObjectDoesNotExist:
-                messages.error(request,'La queja con numero %s no existe' %(form_limpio['num_queja']))
+    if tipo == "region":
+
+        var_quejas_regiones =  correr_sql(query="select qr.id, qr.nombre , count(qq.id) as total from quejas_queja qq join quejas_sucursal qs on qq.sucursal_id = qs.id join quejas_municipio qm on qs.municipio_id = qm.id join quejas_departamento qd on qm.departamento_id = qd.id join quejas_region qr on qd.region_id = qr.id group by qr.id, qr.nombre")
+
+        if var_quejas_regiones:
+            encabezado = ["Id Region", "Region", "Total"]
             
+            tabla_datos = {"encabezado":encabezado,"filas":var_quejas_regiones}
 
-            if var_queja:
+            contexto={"tabla":tabla_datos, "tipo":"region", "titulo_seccion":"Quejas por region"}
 
-                tabla_acciones = Accion.objects.filter(queja=var_queja.id)
+            return render(request, "resultados_quejas.html", contexto)
 
-                filas = []
-
-                if tabla_acciones:
-                    for accion in tabla_acciones:
-                        if accion.usuario: var_email = accion.usuario.email
-                        else: var_email = ""
-                        filas.append([accion.tipo_accion.descripcion, accion.fecha_creacion])
-                
-                    tabla_datos = {"encabezado":["Tipo de Acción","Fecha de acción"],"filas":filas}
-
-                    contexto={"queja":var_queja,"tabla":tabla_datos}
-
-                    return render(request, "queja_individual.html", contexto)
-
-                else:
-                    messages.error(request,'Ocurrio un error obteniendo las acciones de %s' %(form_limpio['num_queja']))
-            
-    elif request.method == "GET":
-        
-        formulario = form_buscar_queja()
-        
+        else:
+            messages.error(request,'Ocurrio un error obteniendo los datos, por favor intente de nuevo')
     
-    contexto = {"formulario":formulario,"titulo_seccion":"Busqueda de quejas"}
-    return render(request, "busqueda_queja_individual.html", contexto)
+    elif tipo == "departamento":
+
+        if parent_id:
+            var_quejas_regiones =  correr_sql(query="select qd.id, qd.nombre , count(qq.id) as total from quejas_queja qq join quejas_sucursal qs on qq.sucursal_id = qs.id join quejas_municipio qm on qs.municipio_id = qm.id join quejas_departamento qd on qm.departamento_id = qd.id join quejas_region qr on qd.region_id = qr.id where qr.id = %s group by qd.id, qd.nombre" , args=[parent_id])
+        
+        else:
+            var_quejas_regiones =  correr_sql(query="select qd.id, qd.nombre , count(qq.id) as total from quejas_queja qq join quejas_sucursal qs on qq.sucursal_id = qs.id join quejas_municipio qm on qs.municipio_id = qm.id join quejas_departamento qd on qm.departamento_id = qd.id group by qd.nombre")
+
+        if var_quejas_regiones:
+            encabezado = ["Id Departamento", "Departamento", "Total"]
+            
+            tabla_datos = {"encabezado":encabezado,"filas":var_quejas_regiones}
+
+            contexto={"tabla":tabla_datos, "tipo":"departamento", "titulo_seccion":"Quejas por departamento"}
+
+            return render(request, "resultados_quejas.html", contexto)
+
+        else:
+            messages.error(request,'Ocurrio un error obteniendo los datos, por favor intente de nuevo')
+    
+    elif tipo == "municipio":
+
+        if parent_id:
+            var_quejas_regiones =  correr_sql(query="select qm.id, qm.nombre , count(qq.id) as total from quejas_queja qq join quejas_sucursal qs on qq.sucursal_id = qs.id join quejas_municipio qm on qs.municipio_id = qm.id join quejas_departamento qd on qm.departamento_id = qd.id where qd.id = %s group by qm.id, qm.nombre" , args=[parent_id])
+        
+        else:
+            var_quejas_regiones =  correr_sql(query="select qm.id, qm.nombre , count(qq.id) as total from quejas_queja qq join quejas_sucursal qs on qq.sucursal_id = qs.id join quejas_municipio qm on qs.municipio_id = qm.id group by qd.nombre")
+
+        if var_quejas_regiones:
+            encabezado = ["Id Municipio", "Municipio", "Total"]
+            
+            tabla_datos = {"encabezado":encabezado,"filas":var_quejas_regiones}
+
+            contexto={"tabla":tabla_datos, "tipo":"municipio", "titulo_seccion":"Quejas por municipio"}
+
+            return render(request, "resultados_quejas.html", contexto)
+
+        else:
+            messages.error(request,'Ocurrio un error obteniendo los datos, por favor intente de nuevo')
+    
+
+    elif tipo == "comercio":
+
+        if parent_id:
+            var_quejas_regiones =  correr_sql(query="select qn.id, qn.nombre_comercial , count(qq.id) as total from quejas_queja qq join quejas_sucursal qs on qq.sucursal_id = qs.id join quejas_negocio qn on qs.negocio_id = qn.id join quejas_municipio qm on qs.municipio_id = qm.id where qm.id = %s group by qn.id, qn.nombre_comercial" , args=[parent_id])
+        
+        else:
+            var_quejas_regiones =  correr_sql(query="select qn.id, qm.nombre , count(qq.id) as total from quejas_queja qq join quejas_sucursal qs on qq.sucursal_id = qs.id join quejas_municipio qm on qs.municipio_id = qm.id group by qd.nombre")
+
+        if var_quejas_regiones:
+            encabezado = ["Id Comercio", "Comercio", "Total"]
+            
+            tabla_datos = {"encabezado":encabezado,"filas":var_quejas_regiones}
+
+            contexto={"tabla":tabla_datos, "tipo":"comercio", "titulo_seccion":"Quejas por negocio"}
+
+            return render(request, "resultados_quejas.html", contexto)
+
+        else:
+            messages.error(request,'Ocurrio un error obteniendo los datos, por favor intente de nuevo')
+
+
+        """
+
+        elif tipo == "comercio":
+
+        else:
+            messages.error(request, message="El tipo de consulta ingresado no es válido")
+            return redirect('index')
+            """

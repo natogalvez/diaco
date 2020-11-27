@@ -16,7 +16,7 @@ class Departamento(models.Model):
     region = models.ForeignKey(Region, verbose_name="Region", default=None, on_delete=models.SET_DEFAULT)
 
     def __str__(self):
-        return "%s, %s" %(self.nombre, self.region)
+        return "%s" %(self.nombre)
 
 
 class Municipio(models.Model):

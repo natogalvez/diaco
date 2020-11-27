@@ -10,7 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 
 #auth related imports
-from django.contrib.auth.decorators import *
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 
 #form related imports
@@ -51,15 +51,15 @@ def view_ingreso_queja(request):
                 negocio=var_negocio)
 
             var_queja = Queja.objects.create(Sucursal=var_sucursal, 
-                FechaCreacion=datetime.datetime.now(), 
-                FechaActualizacion=datetime.datetime.now(),
-                NotificarEmail=form_limpio["Email"])
+                fecha_creacion=datetime.datetime.now(), 
+                fecha_actualizacion=datetime.datetime.now(),
+                notificar_email=form_limpio["Email"])
         
             ver_accion = Accion.objects.create(
-                Comentario=form_limpio["TextoQueja"],
-                FechaCreacion=datetime.datetime.now(),
-                Queja=var_queja,
-                TipoAccion=TipoAccion.objects.get(Nombre="creacion")                
+                comentario=form_limpio["TextoQueja"],
+                fecha_creacion=datetime.datetime.now(),
+                queja=var_queja,
+                tipo_accion=TipoAccion.objects.get(Nombre="creacion")                
                 )
 
             messages.success(request,'Queja ingresada con éxito. Numero de Queja: %s' %(var_queja.id))
@@ -71,6 +71,7 @@ def view_ingreso_queja(request):
     contexto = {"formulario":formulario}
     return render(request, "ingreso_queja.html", contexto)
 
+@login_required(login_url='login')
 def view_logout_usuario(request):
     logout(request)
     return redirect('index')
@@ -115,4 +116,117 @@ def ver_municipios(request):
 
     return render(request, "lista_municipios.html", context)
 
-# def mostrar_quejas(request):
+#@login_required(login_url='login')
+def view_buscar_queja(request):
+
+    if request.method == "POST":
+
+        formulario = form_buscar_queja(data=request.POST)
+
+        if formulario.is_valid():
+            form_limpio=formulario.cleaned_data
+
+            var_queja=None
+
+            try:
+                var_queja= Queja.objects.get(id=form_limpio['num_queja'])
+            except ObjectDoesNotExist:
+                messages.error(request,'La queja con numero %s no existe' %(form_limpio['num_queja']))
+            
+
+            if var_queja:
+
+                tabla_acciones = Accion.objects.filter(queja=var_queja.id)
+
+                filas = []
+
+                if tabla_acciones:
+                    for accion in tabla_acciones:
+                        
+                        fila = [accion.id, accion.tipo_accion.descripcion, accion.fecha_creacion]
+                        if request.user.is_authenticated:
+                            if accion.usuario: var_email = accion.usuario.email
+                            else: var_email = ""
+                            fila.append(var_email)
+                        
+                        filas.append(fila)
+
+                    nombres_campos = ["id", "tipo_accion","fecha"]
+                    encabezado = ["Numero de Accion", "Tipo de Acción","Fecha de acción"]
+                    if request.user.is_authenticated: encabezado.append("Usuario")
+                    tabla_datos = {"encabezado":encabezado,"filas":filas}
+
+                    contexto={"queja":var_queja,"tabla":tabla_datos, "nombres_campos":nombres_campos}
+
+                    return render(request, "queja_individual.html", contexto)
+
+                else:
+                    messages.error(request,'Ocurrio un error obteniendo las acciones de %s' %(form_limpio['num_queja']))
+            
+    elif request.method == "GET":
+        
+        formulario = form_buscar_queja()
+        
+    
+    contexto = {"formulario":formulario,"titulo_seccion":"Busqueda de quejas"}
+    return render(request, "busqueda_queja_individual.html", contexto)
+
+
+def view_mostrar_accion(request,accion_id):
+
+        var_accion = None
+        
+        try:
+            var_accion = Accion.objects.get(id=accion_id)
+        except ObjectDoesNotExist:
+            messages.error(request,'Hubo un error y no existe esta accion')
+
+        contexto = {"accion":var_accion,"titulo_seccion":"Busqueda de quejas"}
+
+        return render(request, "accion_individual.html",contexto)
+
+def view_buscar_queja_anon(request):
+    
+    if request.method == "POST":
+
+        formulario = form_buscar_queja(data=request.POST)
+
+        if formulario.is_valid():
+            form_limpio=formulario.cleaned_data
+
+            var_queja=None
+
+            try:
+                var_queja= Queja.objects.get(id=form_limpio['num_queja'])
+            except ObjectDoesNotExist:
+                messages.error(request,'La queja con numero %s no existe' %(form_limpio['num_queja']))
+            
+
+            if var_queja:
+
+                tabla_acciones = Accion.objects.filter(queja=var_queja.id)
+
+                filas = []
+
+                if tabla_acciones:
+                    for accion in tabla_acciones:
+                        if accion.usuario: var_email = accion.usuario.email
+                        else: var_email = ""
+                        filas.append([accion.tipo_accion.descripcion, accion.fecha_creacion])
+                
+                    tabla_datos = {"encabezado":["Tipo de Acción","Fecha de acción"],"filas":filas}
+
+                    contexto={"queja":var_queja,"tabla":tabla_datos}
+
+                    return render(request, "queja_individual.html", contexto)
+
+                else:
+                    messages.error(request,'Ocurrio un error obteniendo las acciones de %s' %(form_limpio['num_queja']))
+            
+    elif request.method == "GET":
+        
+        formulario = form_buscar_queja()
+        
+    
+    contexto = {"formulario":formulario,"titulo_seccion":"Busqueda de quejas"}
+    return render(request, "busqueda_queja_individual.html", contexto)

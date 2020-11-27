@@ -9,11 +9,13 @@
             <ul class="nav navbar-nav">
                 <li class="active"><a href="{% url 'index' %}">Inicio</a></li>
                 <li><a href="{% url 'ingreso_queja' %}">Ingresa una queja</a></li>
-                <li><a href="/single/">Consulta de quejas</a></li>
+                {% if user.is_anonymous %}<li><a href="{% url 'buscar_queja' %}">Busca tu queja</a></li>{% endif %}
+                {% if user.is_authenticated %}<li><a href="{% url 'buscar_queja' %}">Busqueda de quejas</a></li>{% endif %}
+                <li><a href="/single/">Consultas / Filtros</a></li>
                 <li><a href="{% url 'login' %}">Ingreso de usuario</a></li>
-                {% if user.is_authenticated %}<li><a href="{% url 'logout' %}">Salida de usuario</a></li> {% endif %}
-                <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Category <i class="fa fa-chevron-down"></i></a>
-                    <div class="dropdown-menu" style="margin-left: -203.625px;">
+                {% if user.is_authenticated %}
+                <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Operaciones de Usuario <i class="fa fa-chevron-down"></i></a>
+                    <div class="dropdown-menu" style="margin-left: -0.5px;">
                         <div class="dropdown-inner">
                             <ul class="list-unstyled">
                                 <li><a href="/archive/">Text 301</a></li>
@@ -22,23 +24,10 @@
                                 <li><a href="/archive/">Text 304</a></li>
                                 <li><a href="/archive/">Text 305</a></li>
                             </ul>
-                            <ul class="list-unstyled">
-                                <li><a href="/archive/">Text 306</a></li>
-                                <li><a href="/archive/">Text 307</a></li>
-                                <li><a href="/archive/">Text 308</a></li>
-                                <li><a href="/archive/">Text 309</a></li>
-                                <li><a href="/archive/">Text 310</a></li>
-                            </ul>
-                            <ul class="list-unstyled">
-                                <li><a href="/archive/">Text 311</a></li>
-                                <li><a href="/archive/">Text 312</a></li>
-                                <li><a href="/archive#/">Text 313</a></li>
-                                <li><a href="/archive#/">Text 314</a></li>
-                                <li><a href="/archive/">Text 315</a></li>
-                            </ul>
                         </div>
                     </div>
                 </li>
+                <li><a href="{% url 'logout' %}">Salida de usuario</a></li> {% endif %}
             </ul>
         </div>
     </div>

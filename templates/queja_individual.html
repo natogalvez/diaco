@@ -6,7 +6,9 @@
 	{% block menu %}
 	{% include "menu/menu.html" %}
 	{% endblock %}
-
+	{% block hero %}
+	
+	{% endblock %}
 		</div>
 	</header>
 	<!-- /Section: intro -->
@@ -22,11 +24,10 @@
 				<article class="single-post">
 					<div class="wrap-post"><!--Start Box-->
 						<div class="entry-header text-center">
-							<h1 class="entry-title">{{titulo_seccion}}</h1>
+							<h1 class="entry-title">Resultados de busqueda de queja</h1>
 						</div>
-						<div class="entry-content">
-							{% include "content/tabla.html" %}
-						</div>
+						<p>{% include "content/mensajes.html" %}</p>
+						<p>{% include "content/mostrar_queja.html" %}</p>
 					</div>
 				</article>
 			</div>	

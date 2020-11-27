@@ -1,0 +1,16 @@
+<div class="entry-content">
+    <p><b> Tipo de Acci&oacute;n:</b> {{accion.id}}</p>
+    <p><b>Fecha:</b> {{accion.fecha}}</p>
+    <p><b>Es resolucion?</b>&nbsp;&nbsp;
+        {% if accion.tipo_accion.es_accion_cierre %}
+        Si
+        {% else %}
+        No
+        {% endif %}
+    
+    </p>
+    {% if user.is_authenticated %}<p><b>Usuario:</b> {{accion.usuario}}</p>{% endif %}
+    <p><b>Comentario ingresado: </b></p>
+    <p>{{accion.comentario}}</p>
+
+</div>

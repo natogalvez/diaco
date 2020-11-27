@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+    {% block title %}Inicio | Direcci&oacute;n de atenci&oacute;n al consumidor{% endblock %}
+
+	{% block menu %}
+	{% include "menu/menu.html" %}
+	{% endblock %}
+
+		</div>
+	</header>
+	<!-- /Section: intro -->
+
+
+	<!--////////////////////////////////////Container-->
+	{% block content %}
+	<section id="page-content" class="index-page">
+	
+		<!-- ////////////Content Box 01 -->
+		<section class="box-content box-1">
+			<div class="container">
+				<div class="heading wow fadeInUp" data-wow-delay=".1s" data-wow-duration="1s">
+					<h2>Formulario de ingreso de Quejas</h2>
+					<hr class="line">
+				</div>
+				{% include "content/messages.html" %}
+				<div class="content">
+					<div class="col-sm-10 col-sm-offset-1">
+						<form id="ingreso_queja" class="wow fadeInUp" data-wow-delay=".1s" data-wow-duration="1s" action="" method="POST"> {% csrf_token %}
+							<table>
+								{% for field in formulario %}
+								<div class="row">
+									<tr>
+										<!-- Name -->
+										<div class="col-md-4">
+											<div class="form-group">
+												<td style="text-align: right; padding-right: 2px;">{{field.label}}</td>
+												<td>  {{field}}</td>
+											</div>
+										</div>
+									</tr>
+								</div>
+								{% endfor %}
+							</table>
+							<div class="row">
+								<button type="submit" id="form-submit" class="btn btn-skin btn-block" id="submit_btn">Ingresar</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</section>
+		
+	</section>
+	{% endblock %}

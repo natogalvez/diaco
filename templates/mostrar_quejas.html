@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+    {% block title %}Inicio | Direcci&oacute;n de atenci&oacute;n al consumidor{% endblock %}
+
+	{% block menu %}
+	{% include "menu/menu.html" %}
+	{% endblock %}
+
+		</div>
+	</header>
+	<!-- /Section: intro -->
+
+
+	<!--////////////////////////////////////Container-->
+	{% block content %}
+	<div id="page-content">
+		
+		<div class="box-content">
+			<div class="container">
+				<!-----------------Content-------------------->
+				<article class="single-post">
+					<div class="wrap-post"><!--Start Box-->
+						<div class="entry-header text-center">
+							<h1 class="entry-title">{{titulo_seccion}}</h1>
+						</div>
+						<div class="entry-content">
+							{% include "content/tabla.html" %}
+						</div>
+					</div>
+				</article>
+			</div>	
+			
+		</div>
+		
+	</div>
+		
+	{% endblock %}

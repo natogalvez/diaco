@@ -1,0 +1,12 @@
+{% if messages %}
+<ul class="messages wow fadeInUp" data-wow-delay=".1s" data-wow-duration="1s">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}<label style="color: #a94442;">{{message}}</label>
+        {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}<label style="color: green;">{{message}}</label>
+        {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+{% endif %}
+

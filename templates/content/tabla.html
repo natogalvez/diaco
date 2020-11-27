@@ -1,0 +1,22 @@
+{% if tabla %}
+<table class="tg">
+    <thead>
+      <tr>
+        {% for dato in tabla.encabezado %}
+        <th>{{dato}}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for fila in tabla.filas %}
+      <tr>
+        {% for dato in fila %}
+        <td > {{dato}} </td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+</table>
+    
+{% endif %}
+

@@ -267,7 +267,7 @@ def view_consulta_queja(request,tipo,parent_id=None):
             var_quejas_regiones =  correr_sql(query="select qn.id, qn.nombre_comercial , count(qq.id) as total from quejas_queja qq join quejas_sucursal qs on qq.sucursal_id = qs.id join quejas_negocio qn on qs.negocio_id = qn.id join quejas_municipio qm on qs.municipio_id = qm.id where qm.id = %s group by qn.id, qn.nombre_comercial" , args=[parent_id])
         
         else:
-            var_quejas_regiones =  correr_sql(query="select qn.id, qm.nombre , count(qq.id) as total from quejas_queja qq join quejas_sucursal qs on qq.sucursal_id = qs.id join quejas_municipio qm on qs.municipio_id = qm.id group by qd.nombre")
+            var_quejas_regiones =  correr_sql(query="select qn.id, qn.nombre_comercial , count(qq.id) as total from quejas_queja qq join quejas_sucursal qs on qq.sucursal_id = qs.id join quejas_municipio qm on qs.municipio_id = qm.id join quejas_negocio qn on qs.negocio_id = qn.id group by qn.id, qn.nombre_comercial")
 
         if var_quejas_regiones:
             encabezado = ["Id Comercio", "Comercio", "Total"]
